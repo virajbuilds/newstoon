@@ -1,12 +1,23 @@
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import MainApp from './routes/MainApp';
-import CartoonPage from './routes/CartoonPage';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-export default function App() {
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <div>Hello World - Testing</div>
+  }
+], {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true
+  }
+});
+
+function App() {
   return (
-    <BrowserRouter>
-      {/* Your routes here */}
-    </BrowserRouter>
+    <div className="app">
+      <RouterProvider router={router} />
+    </div>
   );
 }
+
+export default App;
