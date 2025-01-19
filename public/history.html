@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News2Toon AI - Generation History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tab-active {
+            border-bottom: 2px solid #4f46e5;
+            color: #4f46e5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Generation History</h1>
+            <a href="/" class="text-indigo-600 hover:text-indigo-700">Back to Generator</a>
+        </div>
+
+        <!-- Tabs -->
+        <div class="border-b border-gray-200 mb-8">
+            <div class="flex space-x-8">
+                <button onclick="showTab('all')" class="tab-active px-4 py-2 text-sm font-medium">
+                    All Generations
+                </button>
+                <button onclick="showTab('prompts')" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    Prompts Only
+                </button>
+                <button onclick="showTab('images')" class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                    Images Only
+                </button>
+            </div>
+        </div>
+
+        <!-- Content sections -->
+        <div id="all" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- All generations will be loaded here -->
+        </div>
+
+        <div id="prompts" class="hidden space-y-6">
+            <!-- Prompts will be loaded here -->
+        </div>
+
+        <div id="images" class="hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Images will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        let generations = [];
+
+        async function loadHistory() {
+            try {
+                const response = await fetch('http://localhost:3001/api/history');
+                generations = await response.json();
+                showTab('all');
+            } catch (error) {
+                console.error('Error loading history:', error);
+                alert('Failed to load history. Please ensure the history server is running.');
+            }
+        }
+
+        function showTab(tabName) {
+            // Update tab styles
+            document.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('tab-active');
+                if (btn.onclick.toString().includes(tabName)) {
+                    btn.classList.add('tab-active');
+                }
+            });
+
+            // Hide all sections
+            ['all', 'prompts', 'images'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+
+            // Show selected section
+            const section = document.getElementById(tabName);
+            section.classList.remove('hidden');
+
+            // Render content based on tab
+            switch(tabName) {
+                case 'all':
+                    renderAll();
+                    break;
+                case 'prompts':
+                    renderPrompts();
+                    break;
+                case 'images':
+                    renderImages();
+                    break;
+            }
+        }
+
+        function renderAll() {
+            const container = document.getElementById('all');
+            container.innerHTML = generations.map(gen => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="${gen.image_url}" alt="Generated cartoon" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <div class="mb-2">
+                            <h3 class="font-semibold text-gray-900">Input:</h3>
+                            <p class="text-gray-700 text-sm">${gen.input_text}</p>
+                        </div>
+                        <div class="mb-2">
+                            <h3 class="font-semibold text-gray-900">Story Prompt:</h3>
+                            <p class="text-gray-700 text-sm">${gen.story_prompt}</p>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            Generated: ${new Date(gen.created_at).toLocaleString()}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPrompts() {
+            const container = document.getElementById('prompts');
+            container.innerHTML = generations.map(gen => `
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-900">Input Text:</h3>
+                        <p class="text-gray-700">${gen.input_text}</p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-gray-900">Generated Story Prompt:</h3>
+                        <p class="text-gray-700">${gen.story_prompt}</p>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        Generated: ${new Date(gen.created_at).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderImages() {
+            const container = document.getElementById('images');
+            container.innerHTML = generations.map(gen => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img src="${gen.image_url}" alt="Generated cartoon" class="w-full h-48 object-cover">
+                    <div class="p-2 text-xs text-gray-500">
+                        ${new Date(gen.created_at).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>

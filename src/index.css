@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-comic {
+  font-family: 'Wellfleet', cursive;
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress 30s linear;
+}
+
+.daily-swiper {
+  padding: 0 40px;
+}
+
+.daily-swiper .swiper-button-next,
+.daily-swiper .swiper-button-prev {
+  color: #4f46e5;
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.daily-swiper .swiper-button-next:after,
+.daily-swiper .swiper-button-prev:after {
+  font-size: 20px;
+}
+
+.daily-swiper .swiper-button-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
