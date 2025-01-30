@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import * as ToastPrimitive from '@radix-ui/react-toast'
 import { X } from 'lucide-react'
 
@@ -7,32 +7,31 @@ interface ToastProps {
   setOpen: (open: boolean) => void
   title: string
   description?: string
-  type?: 'success' | 'error'
+  type?: 'success' | 'error' | 'info'
 }
 
-export function Toast({ open, setOpen, title, description, type = 'error' }: ToastProps) {
+export default function Toast({ open, setOpen, title, description, type = 'info' }: ToastProps) {
+  const bgColor = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    info: 'bg-blue-500'
+  }[type]
+
   return (
     <ToastPrimitive.Provider swipeDirection="right">
       <ToastPrimitive.Root
-        className={`fixed bottom-4 right-4 z-50 flex items-center gap-4 rounded-lg p-4 shadow-lg ${
-          type === 'error' ? 'bg-red-50 text-red-900' : 'bg-green-50 text-green-900'
-        }`}
+        className={`${bgColor} text-white p-4 rounded-lg shadow-lg`}
         open={open}
         onOpenChange={setOpen}
       >
-        <div>
-          <ToastPrimitive.Title className="font-semibold">{title}</ToastPrimitive.Title>
-          {description && (
-            <ToastPrimitive.Description className="mt-1 text-sm">
-              {description}
-            </ToastPrimitive.Description>
-          )}
-        </div>
-        <ToastPrimitive.Close className="absolute right-2 top-2 rounded-md p-1 hover:bg-black/5">
-          <X className="h-4 w-4" />
-        </ToastPrimitive.Close>
+        <ToastPrimitive.Title className="font-medium">{title}</ToastPrimitive.Title>
+        {description && (
+          <ToastPrimitive.Description className="mt-1 text-sm opacity-90">
+            {description}
+          </ToastPrimitive.Description>
+        )}
       </ToastPrimitive.Root>
-      <ToastPrimitive.Viewport />
+      <ToastPrimitive.Viewport className="fixed bottom-0 right-0 flex flex-col p-6 gap-2 w-96 max-w-[100vw] m-0 list-none z-50" />
     </ToastPrimitive.Provider>
   )
 }

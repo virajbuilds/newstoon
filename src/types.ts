@@ -1,18 +1,10 @@
 export interface CartoonGeneration {
-  id?: number;
-  input_text: string;
-  story_prompt: string;
-  image_url: string;
+  id: string;
   title: string;
   actual_title?: string;
-  is_daily: boolean;
-  created_at?: string;
-  user_id?: string;
-  profile?: {
-    id: string;
-    full_name: string;
-    avatar_url: string;
-  };
+  description?: string;
+  image_url: string;
+  created_at: string;
 }
 
 export interface Prompt {

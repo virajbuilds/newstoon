@@ -1,9 +1,32 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { AuthProvider } from './components/AuthProvider';
+import Layout from './components/Layout';
+import DailySection from './components/DailySection';
+import RecentSection from './components/RecentSection';
+import CartoonDetail from './components/CartoonDetail';
+import CreateCartoon from './components/CreateCartoon';
+import ErrorBoundary from './components/ErrorBoundary';
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>Hello World - Testing</div>
+    element: (
+      <Layout>
+        <CreateCartoon />
+        <DailySection />
+        <RecentSection />
+      </Layout>
+    ),
+    errorElement: <ErrorBoundary />
+  },
+  {
+    path: "/cartoon/:id",
+    element: (
+      <Layout>
+        <CartoonDetail />
+      </Layout>
+    ),
+    errorElement: <ErrorBoundary />
   }
 ], {
   future: {
@@ -14,9 +37,9 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <div className="app">
+    <AuthProvider>
       <RouterProvider router={router} />
-    </div>
+    </AuthProvider>
   );
 }
 

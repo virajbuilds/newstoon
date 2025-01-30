@@ -9,7 +9,9 @@ if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export const supabase = supabase;
 
 export async function saveGenerationToSupabase(generation: Omit<CartoonGeneration, 'id' | 'created_at' | 'is_daily' | 'actual_title'>) {
   try {
@@ -62,27 +64,47 @@ export async function saveGenerationToSupabase(generation: Omit<CartoonGeneratio
 }
 
 export async function getDailyGenerations() {
-  try {
-    const { data, error } = await supabase
-      .from('generations')
-      .select(`
-        *,
-        profiles (
-          id,
-          full_name,
-          avatar_url
-        )
-      `)
-      .eq('is_daily', true)
-      .order('created_at', { ascending: false })
-      .limit(10);
+  const { data, error } = await supabase
+    .from('cartoons')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(10);
 
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error('Error fetching daily generations:', error);
-    return [];
-  }
+  if (error) throw error;
+  return data as CartoonGeneration[];
+}
+
+export async function getRecentGenerations() {
+  const { data, error } = await supabase
+    .from('cartoons')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(12);
+
+  if (error) throw error;
+  return data as CartoonGeneration[];
+}
+
+export async function getCartoonById(id: string) {
+  const { data, error } = await supabase
+    .from('cartoons')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) throw error;
+  return data as CartoonGeneration;
+}
+
+export async function createCartoon(cartoon: Partial<CartoonGeneration>) {
+  const { data, error } = await supabase
+    .from('cartoons')
+    .insert([cartoon])
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as CartoonGeneration;
 }
 
 export async function getGenerationById(id: string) {

@@ -3,9 +3,8 @@ import { supabase } from './supabase';
 import { generateImage } from './imageProviders';
 
 const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
-  dangerouslyAllowBrowser: true,
-  timeout: 60000
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true
 });
 
 async function getPromptFromSupabase(name: string) {
@@ -28,20 +27,36 @@ async function getPromptFromSupabase(name: string) {
   }
 }
 
-export const generateCartoonImage = async (prompt: string): Promise<string> => {
-  if (!prompt.trim()) {
-    throw new Error('Empty prompt provided for image generation');
-  }
+export async function generateCartoonPrompt(newsTitle: string) {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: "You are an expert editorial cartoonist. Create a detailed description for an editorial cartoon based on the news title provided."
+      },
+      {
+        role: "user",
+        content: `Create a detailed editorial cartoon description for this news: ${newsTitle}`
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 200
+  });
 
-  try {
-    const { url, provider } = await generateImage(prompt);
-    console.log(`Image generated successfully using ${provider}`);
-    return url;
-  } catch (error) {
-    console.error('Image generation error:', error);
-    throw error;
-  }
-};
+  return completion.choices[0].message.content;
+}
+
+export async function generateCartoonImage(prompt: string) {
+  const response = await openai.images.generate({
+    model: "dall-e-3",
+    prompt: prompt,
+    n: 1,
+    size: "1024x1024",
+  });
+
+  return response.data[0].url;
+}
 
 export const generateCartoonStory = async (content: string) => {
   if (!content.trim()) {
